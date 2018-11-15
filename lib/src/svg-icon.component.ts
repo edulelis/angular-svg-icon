@@ -36,9 +36,7 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 	constructor(private element:ElementRef,
 		private differs:KeyValueDiffers,
 		private renderer:Renderer2,
-		private iconReg:SvgIconRegistryService,
-		@Inject(PLATFORM_ID) private platformId: Object,
-		@Inject(DOCUMENT) private document: any) {
+		private iconReg:SvgIconRegistryService) {
 	}
 
 	ngOnInit() {
