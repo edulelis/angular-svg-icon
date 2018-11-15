@@ -6,9 +6,6 @@ import { Subscription } from 'rxjs';
 
 import { SvgIconRegistryService } from './svg-icon-registry.service';
 
-import { PLATFORM_ID } from '@angular/core';
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-
 @Component({
 	selector: 'svg-icon',
 	styles: [ `:host { display: inline-block; }` ],
