@@ -1,4 +1,4 @@
-import { Inject, Component, DoCheck, ElementRef, HostBinding, Input,
+import { Component, DoCheck, ElementRef, HostBinding, Input,
 	KeyValueChangeRecord, KeyValueChanges, KeyValueDiffer, KeyValueDiffers,
 	OnChanges, OnDestroy, OnInit, Renderer2, SimpleChange } from '@angular/core';
 
@@ -6,8 +6,6 @@ import { Subscription } from 'rxjs';
 
 import { SvgIconRegistryService } from './svg-icon-registry.service';
 
-import { PLATFORM_ID } from '@angular/core';
-import { isPlatformServer, isPlatformBrowser } from '@angular/common';
 
 @Component({
 	selector: 'svg-icon',
@@ -36,45 +34,36 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 	constructor(private element:ElementRef,
 		private differs:KeyValueDiffers,
 		private renderer:Renderer2,
-		private iconReg:SvgIconRegistryService,
-		@Inject(PLATFORM_ID) private platformId: Object) {
+		private iconReg:SvgIconRegistryService) {
 	}
 
 	ngOnInit() {
-        if (isPlatformBrowser(this.platformId)) {
-            this.init();
-        }
+		this.init();
 	}
 
 	ngOnDestroy() {
-        if (isPlatformBrowser(this.platformId)) {
-            this.destroy();
-        }
+		this.destroy();
 	}
 
 	ngOnChanges(changeRecord: {[key:string]:SimpleChange}) {
-        if (isPlatformBrowser(this.platformId)) {
-            if (changeRecord['src']) {
-                if (this.svg) {
-                    this.destroy();
-                }
-                this.init();
-            }
-            if (changeRecord['stretch']) {
-                this.stylize();
-            }
-        }
+		if (changeRecord['src']) {
+			if (this.svg) {
+				this.destroy();
+			}
+			this.init();
+		}
+		if (changeRecord['stretch']) {
+			this.stylize();
+		}
 	}
 
 	ngDoCheck() {
-        if (isPlatformBrowser(this.platformId)) {
-            if (this.svg && this.differ) {
-                const changes = this.differ.diff(this._svgStyle);
-                if (changes) {
-                    this.applyChanges(changes);
-                }
-            }
-        }
+		if (this.svg && this.differ) {
+			const changes = this.differ.diff(this._svgStyle);
+			if (changes) {
+				this.applyChanges(changes);
+			}
+		}
 	}
 
 	private init() {
