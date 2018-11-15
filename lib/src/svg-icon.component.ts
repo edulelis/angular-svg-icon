@@ -1,4 +1,4 @@
-import { Inject, Component, DoCheck, ElementRef, HostBinding, Input,
+import { Component, DoCheck, ElementRef, HostBinding, Input,
 	KeyValueChangeRecord, KeyValueChanges, KeyValueDiffer, KeyValueDiffers,
 	OnChanges, OnDestroy, OnInit, Renderer2, SimpleChange } from '@angular/core';
 
@@ -93,8 +93,8 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 		if (svg) {
 			this.svg = svg;
 			const icon = <SVGElement>svg.cloneNode(true);
-
 			const elem = this.element.nativeElement;
+			
 			elem.innerHTML = '';
 			this.renderer.appendChild(elem, icon);
 
