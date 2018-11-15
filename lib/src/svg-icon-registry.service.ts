@@ -5,35 +5,38 @@ import { Observable, of as observableOf, throwError as observableThrowError } fr
 import { map, tap, catchError, finalize, share } from 'rxjs/operators';
 
 import { PLATFORM_ID } from '@angular/core';
-import { isPlatformServer, isPlatformBrowser } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class SvgIconRegistryService {
 
 	private iconsByUrl = new Map<string, SVGElement>();
 	private iconsLoadingByUrl = new Map<string, Observable<SVGElement>>();
 
-	constructor(private http:HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {
+	constructor(private http:HttpClient,
+				@Inject(PLATFORM_ID) private platformId: Object,
+				@Inject(DOCUMENT) private document: any,
+                @Optional() @Inject('SERVER_URL') protected serverUrl: string) {
 	}
 
 	/** Add a SVG to the registry by passing a name and the SVG. */
 	addSvg(name:string, data:string) {
-        if (isPlatformBrowser(this.platformId)) {
-			if (!this.iconsByUrl.has(name)) {
-				const div = document.createElement('DIV');
-				div.innerHTML = data;
-				const svg = <SVGElement>div.querySelector('svg');
-				this.iconsByUrl.set(name, svg);
-			}
-        }
+		if (!this.iconsByUrl.has(name)) {
+            const div = this.document.createElement('DIV');
+			div.innerHTML = data;
+			const svg = <SVGElement>div.querySelector('svg');
+			this.iconsByUrl.set(name, svg);
+		}
 	}
 
 	/** Load a SVG to the registry from a URL. */
-	loadSvg(url:string) : Observable<SVGElement | null> {
+	loadSvg(url:string) : Observable<SVGElement> {
 
-        if (isPlatformServer(this.platformId)) {
-            return observableOf(null);
-        }
+		if (this.serverUrl) {
+			url = this.serverUrl + url;
+		}
 
 		if (this.iconsByUrl.has(url)) {
 			return observableOf(this.iconsByUrl.get(url));
@@ -42,7 +45,7 @@ export class SvgIconRegistryService {
 		} else {
 			const o = <Observable<SVGElement>> this.http.get(url, { responseType: 'text' }).pipe(
 				map(svg => {
-					const div = document.createElement('DIV');
+					const div = this.document.createElement('DIV');
 					div.innerHTML = svg;
 					return <SVGElement>div.querySelector('svg');
 				}),
@@ -62,20 +65,8 @@ export class SvgIconRegistryService {
 
 	/** Remove a SVG from the registry by URL (or name). */
 	unloadSvg(url:string) {
-        if (isPlatformBrowser(this.platformId)) {
-            if (this.iconsByUrl.has(url)) {
-                this.iconsByUrl.delete(url);
-            }
-        }
+		if (this.iconsByUrl.has(url)) {
+			this.iconsByUrl.delete(url);
+		}
 	}
 }
-
-export function SVG_ICON_REGISTRY_PROVIDER_FACTORY(parentRegistry:SvgIconRegistryService, http:HttpClient, platformId: Object) {
-	return parentRegistry || new SvgIconRegistryService(http, platformId);
-}
-
-export const SVG_ICON_REGISTRY_PROVIDER = {
-	provide: SvgIconRegistryService,
-	deps: [ [new Optional(), new SkipSelf(), SvgIconRegistryService], HttpClient ],
-	useFactory: SVG_ICON_REGISTRY_PROVIDER_FACTORY
-};

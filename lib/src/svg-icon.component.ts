@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { SvgIconRegistryService } from './svg-icon-registry.service';
 
 import { PLATFORM_ID } from '@angular/core';
-import { isPlatformServer, isPlatformBrowser } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 @Component({
 	selector: 'svg-icon',
@@ -37,44 +37,37 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 		private differs:KeyValueDiffers,
 		private renderer:Renderer2,
 		private iconReg:SvgIconRegistryService,
-		@Inject(PLATFORM_ID) private platformId: Object) {
+		@Inject(PLATFORM_ID) private platformId: Object,
+		@Inject(DOCUMENT) private document: any) {
 	}
 
 	ngOnInit() {
-        if (isPlatformBrowser(this.platformId)) {
-            this.init();
-        }
+		this.init();
 	}
 
 	ngOnDestroy() {
-        if (isPlatformBrowser(this.platformId)) {
-            this.destroy();
-        }
+		this.destroy();
 	}
 
 	ngOnChanges(changeRecord: {[key:string]:SimpleChange}) {
-        if (isPlatformBrowser(this.platformId)) {
-            if (changeRecord['src']) {
-                if (this.svg) {
-                    this.destroy();
-                }
-                this.init();
-            }
-            if (changeRecord['stretch']) {
-                this.stylize();
-            }
-        }
+		if (changeRecord['src']) {
+			if (this.svg) {
+				this.destroy();
+			}
+			this.init();
+		}
+		if (changeRecord['stretch']) {
+			this.stylize();
+		}
 	}
 
 	ngDoCheck() {
-        if (isPlatformBrowser(this.platformId)) {
-            if (this.svg && this.differ) {
-                const changes = this.differ.diff(this._svgStyle);
-                if (changes) {
-                    this.applyChanges(changes);
-                }
-            }
-        }
+		if (this.svg && this.differ) {
+			const changes = this.differ.diff(this._svgStyle);
+			if (changes) {
+				this.applyChanges(changes);
+			}
+		}
 	}
 
 	private init() {
@@ -102,8 +95,8 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 		if (svg) {
 			this.svg = svg;
 			const icon = <SVGElement>svg.cloneNode(true);
-			const elem = this.element.nativeElement;
 
+			const elem = this.element.nativeElement;
 			elem.innerHTML = '';
 			this.renderer.appendChild(elem, icon);
 

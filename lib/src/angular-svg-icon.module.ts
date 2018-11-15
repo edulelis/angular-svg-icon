@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 
-import { SVG_ICON_REGISTRY_PROVIDER } from './svg-icon-registry.service';
+import { SvgIconRegistryService } from './svg-icon-registry.service';
 import { SvgIconComponent } from './svg-icon.component';
 
 @NgModule({
@@ -10,7 +10,7 @@ import { SvgIconComponent } from './svg-icon.component';
 		CommonModule,
 	],
 	declarations: [ SvgIconComponent ],
-	providers:    [ SVG_ICON_REGISTRY_PROVIDER ],
+	providers:    [ SvgIconRegistryService ],
 	exports:      [ SvgIconComponent ]
 })
 
