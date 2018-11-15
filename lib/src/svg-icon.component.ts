@@ -94,7 +94,7 @@ export class SvgIconComponent implements OnInit, OnDestroy, OnChanges, DoCheck {
 			this.svg = svg;
 			const icon = <SVGElement>svg.cloneNode(true);
 			const elem = this.element.nativeElement;
-			
+
 			elem.innerHTML = '';
 			this.renderer.appendChild(elem, icon);
 
