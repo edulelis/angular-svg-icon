@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional, SkipSelf } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Optional, SkipSelf } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable, of as observableOf, throwError as observableThrowError } from 'rxjs';
@@ -7,18 +7,22 @@ import { map, tap, catchError, finalize, share } from 'rxjs/operators';
 import { PLATFORM_ID } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
+export const SERVER_URL = new InjectionToken<string>('SERVER_URL');
+
 @Injectable({
     providedIn: 'root',
 })
 export class SvgIconRegistryService {
 
+    private document: Document;
 	private iconsByUrl = new Map<string, SVGElement>();
 	private iconsLoadingByUrl = new Map<string, Observable<SVGElement>>();
 
 	constructor(private http:HttpClient,
 				@Inject(PLATFORM_ID) private platformId: Object,
-				@Inject(DOCUMENT) private document: any,
-                @Optional() @Inject('SERVER_URL') protected serverUrl: string) {
+                @Optional() @Inject(SERVER_URL) protected serverUrl: string,
+				@Optional() @Inject(DOCUMENT) private _document: any) {
+		this.document = this._document;
 	}
 
 	/** Add a SVG to the registry by passing a name and the SVG. */
@@ -34,7 +38,7 @@ export class SvgIconRegistryService {
 	/** Load a SVG to the registry from a URL. */
 	loadSvg(url:string) : Observable<SVGElement> {
 
-		if (this.serverUrl) {
+		if (this.serverUrl && url.match(/^(http(s)?):/) === null) {
 			url = this.serverUrl + url;
 		}
 
@@ -70,3 +74,13 @@ export class SvgIconRegistryService {
 		}
 	}
 }
+
+export function SVG_ICON_REGISTRY_PROVIDER_FACTORY(parentRegistry:SvgIconRegistryService, http:HttpClient, platformId: Object, serverUrl?: string, document?: any) {
+    return parentRegistry || new SvgIconRegistryService(http, platformId,  serverUrl, document);
+}
+
+export const SVG_ICON_REGISTRY_PROVIDER = {
+    provide: SvgIconRegistryService,
+    deps: [ [new Optional(), new SkipSelf(), SvgIconRegistryService], HttpClient, [PLATFORM_ID as InjectionToken<any>], [new Optional(), SERVER_URL as InjectionToken<string>], [new Optional(), DOCUMENT as InjectionToken<any>] ],
+    useFactory: SVG_ICON_REGISTRY_PROVIDER_FACTORY
+};
