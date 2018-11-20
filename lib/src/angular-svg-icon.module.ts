@@ -10,7 +10,7 @@ import { SvgIconComponent } from './svg-icon.component';
 		CommonModule,
 	],
 	declarations: [ SvgIconComponent ],
-    providers:    [ SVG_ICON_REGISTRY_PROVIDER ],
+	providers:    [ SVG_ICON_REGISTRY_PROVIDER ],
 	exports:      [ SvgIconComponent ]
 })
 
