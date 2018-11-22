@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { SvgIconRegistryService } from './svg-icon-registry.service';
 
+
 @Component({
 	selector: 'svg-icon',
 	styles: [ `:host { display: inline-block; }` ],
