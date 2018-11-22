@@ -9,9 +9,7 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 export const SERVER_URL = new InjectionToken<string>('SERVER_URL');
 
-@Injectable({
-	providedIn: 'root',
-})
+@Injectable()
 export class SvgIconRegistryService {
 
 	private document: Document;
